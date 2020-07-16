@@ -1,60 +1,93 @@
 <template>
-  <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
+  <v-app id="inspire">
+    <navigation></navigation>
+    <v-toolbar color="indigo" dark fixed app>
+      <v-toolbar-side-icon @click.stop="toggleNavDrawer"></v-toolbar-side-icon>
+      <v-toolbar-title>Virtual Standup Notes</v-toolbar-title>
       <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
-
+      <v-select
+        prepend-icon="person"
+        :items="teamMembers"
+        item-text="name"
+        item-value="_id"
+        label="Filter by team member"
+        v-on:change="filterByTeamMember"
+      ></v-select>
+      <v-spacer></v-spacer>
+    </v-toolbar>
     <v-content>
-      <HelloWorld/>
+      <v-container fluid fill-height>
+        <router-view></router-view>
+      </v-container>
     </v-content>
+    <v-footer color="indigo" app class="pl-2">
+      <span class="white--text">Pluralsight - Fundamentals of Mongoose.js for Node and MongoDB</span>
+    </v-footer>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+import Navigation from './components/Navigation.vue' 
 
-export default {
-  name: 'App',
-
-  components: {
-    HelloWorld,
-  },
-
+export default { 
   data: () => ({
-    //
+    
   }),
-};
+  computed: {
+      teamMembers () {
+        let team = this.$store.getters.teamMembers
+        team.unshift({"_id": "0", "name": "Show All"})
+
+        return team
+      }
+    },
+  components: {
+    Navigation
+  }, 
+  methods: {
+    getProjects: function () {
+      this.$store.dispatch('getProjects')
+    },
+    getTeamMembers: function () {
+      this.$store.dispatch('getTeamMembers')
+    },
+    toggleNavDrawer: function () {
+      this.$store.dispatch('toggleNavDrawer')
+    },
+    filterByTeamMember: function (teamMemberId) {      
+      if (teamMemberId === "0") {
+        this.$store.dispatch('getStandups')
+      }
+      else {
+        this.$store.dispatch('getStandupsByTeamMemberId', teamMemberId)
+      }      
+    }    
+  },
+  mounted: async function () {
+    await this.getProjects()
+    await this.getTeamMembers()
+  }
+}
 </script>
+
+<style>
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
+#nav {
+  padding: 30px;
+}
+
+#nav a {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+#nav a.router-link-exact-active {
+  color: #42b983;
+}
+</style>

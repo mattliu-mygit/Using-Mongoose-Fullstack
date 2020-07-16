@@ -23,7 +23,20 @@ app.use(function (req, res) {
   res.json(err);
 });
 
-// Add MongoDB connection in later... first just run app.listen (below)
-app.listen(app.get('port'), function () {
-  console.log('API Server Listening on port ' + app.get('port') + '!');
+const mongoose = require('mongoose');
+mongoose.connect(
+  'mongodb+srv://mattliu:kevin0122@cluster0.eio7d.mongodb.net/virtualstandups?retryWrites=true&w=majority',
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function () {
+  console.log('Connected to MongoDB');
+  // Add MongoDB connection in later... first just run app.listen (below)
+  app.listen(app.get('port'), function () {
+    console.log('API Server Listening on port ' + app.get('port') + '!');
+  });
 });

@@ -1,14 +1,28 @@
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import store from './store'
-import vuetify from './plugins/vuetify';
+import Vue from 'vue';
+import Vuetify from 'vuetify';
+import App from './App';
+import router from './router';
+import axios from 'axios';
 
-Vue.config.productionTip = false
+// Vuex store
+import store from './store';
+
+// Vuetify styles and icons
+import 'vuetify/dist/vuetify.min.css'; // Ensure you are using css-loader
+import 'material-design-icons-iconfont/dist/material-design-icons.css';
+
+Vue.config.productionTip = false;
+
+Vue.use(Vuetify);
+
+// Setup axios to be available globally through Vue
+Vue.axios = Vue.prototype.$http = axios.create({
+  baseURL: 'http://localhost:8081/api',
+});
 
 new Vue({
+  vuetify: new Vuetify(),
   router,
   store,
-  vuetify,
-  render: h => h(App)
-}).$mount('#app')
+  render: (h) => h(App),
+}).$mount('#app');
